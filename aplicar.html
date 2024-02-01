@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de quejas de consumidores</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        table {
+            table-layout: fixed;
+            width: 50%;
+        }
+        table #tabla-complaints-by-product {
+            height: 200px; /* Ajusta la altura según sea necesario */
+        }
+        table #tabla-complaints-by-state {
+            height: 250px; /* Ajusta la altura según sea necesario */
+        }
+        table #tabla-company-responses {
+            height: 180px; /* Ajusta la altura según sea necesario */
+        }
+        table #tabla-complaints-by-month-and-year {
+            height: 250px; /* Ajusta la altura según sea necesario */
+        }
+        table td, table th {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 150px; /* Establece el ancho máximo de las celdas, ajusta según sea necesario */
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Reporte de quejas de consumidores</h1>
+    <div style="display: flex; justify-content: space-between;">
+        <table border="1" id="tabla-complaints-by-product" style="width: 25%;">
+            <thead>
+                <th colspan="2">Quejas por producto</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Zapatillas deportivas</td>
+                    <td>120</td>
+                </tr>
+                <tr>
+                    <td>Teléfonos móviles</td>
+                    <td>90</td>
+                </tr>
+                <tr>
+                    <td>Computadoras portátiles</td>
+                    <td>70</td>
+                </tr>
+            </tbody>
+        </table>
+        <table border="1" id="tabla-complaints-by-state" style="width: 25%;">
+            <thead>
+                <th colspan="2">Quejas por estado</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>California</td>
+                    <td>60</td>
+                </tr>
+                <tr>
+                    <td>Texas</td>
+                    <td>50</td>
+                </tr>
+                <tr>
+                    <td>Nueva York</td>
+                    <td>40</td>
+                </tr>
+            </tbody>
+        </table>
+        <table border="1" id="tabla-company-responses" style="width: 25%;">
+            <thead>
+                <th colspan="2">Respuestas de las empresas</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Nike</td>
+                    <td>Reembolso parcial y cambio de producto</td>
+                </tr>
+                <tr>
+                    <td>Samsung</td>
+                    <td>Reparación gratuita del producto</td>
+                </tr>
+                <tr>
+                    <td>Apple</td>
+                    <td>Reemplazo del producto por uno nuevo</td>
+                </tr>
+            </tbody>
+        </table>
+        <table border="1" id="tabla-complaints-by-month-and-year" style="width: 25%;">
+            <thead>
+                <th colspan="3">Quejas por mes y año</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Diciembre</td>
+                    <td>2023</td>
+                    <td>180</td>
+                </tr>
+                <tr>
+                    <td>Enero</td>
+                    <td>2024</td>
+                    <td>150</td>
+                </tr>
+                <tr>
+                    <td>Febrero</td>
+                    <td>2024</td>
+                    <td>120</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function() {
+            // Hacer la solicitud a la ruta /complaints_by_product al cargar la página
+            $.ajax({
+                url: '/complaints_by_product',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    // Actualizar la tabla con los resultados obtenidos
+                    if (response.mensaje === 'Exito') {
+                        // Limpiar la tabla
+                        $('#tabla-complaints-by-product tbody').empty();
+                        // Iterar sobre los resultados y agregar filas a la tabla
+                        $.each(response.productos, function(index

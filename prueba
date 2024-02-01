@@ -1,0 +1,86 @@
+import cv2
+import easyocr
+import pandas as pd
+import tkinter as tk
+from tkinter import messagebox, filedialog
+
+# Función que se ejecuta al hacer clic en el botón de finalizar
+def finalizar():
+    if 'Confianza' in df.columns:
+        # Filtrar placas con confianza superior al umbral y con al menos 6 caracteres
+        threshold = 0.8
+        min_plate_length = 6
+        filtered_plates = df[(df['Confianza'] > threshold) & (df['Texto'].str.len() >= min_plate_length)]
+
+        if not filtered_plates.empty:
+            # Mostrar los datos ingresados en una ventana de mensaje
+            messagebox.showinfo('Placas Reconocidas', filtered_plates.to_string(index=False))
+        else:
+            messagebox.showinfo('Placas Reconocidas', 'No se han detectado placas con suficiente confianza o longitud mínima.')
+
+    else:
+        messagebox.showinfo('Placas Reconocidas', 'No se han detectado placas con suficiente confianza o longitud mínima.')
+
+    # Liberar recursos y cerrar la ventana principal
+    cap.release()
+    cv2.destroyAllWindows()
+    root.destroy()
+
+# Función para cargar una imagen y realizar el reconocimiento de placas
+def cargar_imagen():
+    # Abrir cuadro de diálogo para seleccionar una imagen
+    file_path = filedialog.askopenfilename(title='Seleccionar Imagen', filetypes=[('Archivos de Imagen', '*.png;*.jpg;*.jpeg;*.bmp')])
+
+    if file_path:
+        # Leer la imagen seleccionada
+        image = cv2.imread(file_path)
+
+        # Convertir a escala de grises para el procesamiento
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Detección de texto con EasyOCR
+        results = reader.readtext(gray)
+
+        # Dibujar rectángulos alrededor de las matrículas detectadas
+        for detection in results:
+            # Obtener el texto reconocido y la confianza
+            text, confidence = detection[1], detection[2]
+
+            # Almacenar los resultados en la lista como un diccionario
+            results_list.append({'Texto': text, 'Confianza': confidence})
+
+            # Obtener coordenadas del cuadro del texto
+            bbox = detection[0]
+
+            # Dibujar rectángulo alrededor del texto
+            cv2.rectangle(image, tuple(map(int, bbox[0])), tuple(map(int, bbox[2])), (0, 255, 0), 2)
+
+        # Crear un DataFrame de Pandas a partir de la lista de resultados
+        global df
+        df = pd.DataFrame(results_list)
+
+        # Mostrar la tabla en una ventana de OpenCV
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(image, df.to_string(index=False), (10, 30), font, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.imshow('Reconocimiento de Placas', image)
+
+# Configuración de EasyOCR
+reader = easyocr.Reader(['en'])
+
+# Lista para almacenar los resultados como diccionarios
+results_list = []
+
+# Crear ventana principal de tkinter
+root = tk.Tk()
+root.title('Reconocimiento de Placas')
+
+# Botón para cargar una imagen
+btn_cargar_imagen = tk.Button(root, text='Cargar Imagen', command=cargar_imagen)
+btn_cargar_imagen.pack(pady=10)
+
+# Botón de finalizar
+btn_finalizar = tk.Button(root, text='Finalizar', command=finalizar)
+btn_finalizar.pack(pady=10)
+
+# Iniciar el bucle principal de tkinter
+root.mainloop()
